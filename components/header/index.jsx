@@ -18,28 +18,30 @@ import io from "socket.io-client";
 import { Modal, Button, Slider } from "react-rainbow-components";
 import useSound from "use-sound";
 import moment from "moment";
-import { useCookies } from "react-cookie";
+import axios from "axios";
 
 const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
   //? check role for position
   const router = useRouter();
-  const path = router.asPath;
-  const [cookies, setCookie, removeCookie] = useCookies(["cookies"]);
-  const [select, setSelect] = useState("admin"); //* admin=ผู้ดูแลระบบ,developer=ผู้ดูแลโครงการ,guard=หน่วยรักษาความปลอดภัย
-  // console.log(parseFloat(cookies.volume));
+  const [role, setrole] = useState(); //* admin=ผู้ดูแลระบบ,developer=ผู้ดูแลโครงการ,guard=หน่วยรักษาความปลอดภัย
 
   //? Sound
   const [option, setOption] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [play, { stop }] = useSound("/sounds/alert.mp3", {
     volume: volume,
-    playbackRate: 0.9,
-    interrupt: false,
   });
   const [alert, setAlert] = useState([]);
 
   useEffect(() => {
-    if (cookies.volume) setVolume(parseFloat(cookies.volume));
+    var user = JSON.parse(localStorage.getItem("user"));
+    // console.log(user.token)
+    if (localStorage.getItem("volume"))
+      setVolume(parseFloat(localStorage.getItem("volume")));
+
+    if (localStorage.getItem("user")) {
+      setrole(user.data.role);
+    } else router.push("/");
 
     if (project) {
       const socket = io(`http://13.213.85.55:3030/`, {
@@ -50,7 +52,6 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
       });
 
       socket.on("notification", (data) => {
-        // console.log(data);
         setAlertRedux(data);
         setAlert(data);
         play();
@@ -162,13 +163,13 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                                       },
                                     });
                                     //! check role for change path
-                                    if (select == "admin")
+                                    if (role == "admin")
                                       router.push(
                                         "/admin/company/type/project/monitor"
                                       );
-                                    else if (select == "developer")
+                                    else if (role == "developer")
                                       router.push("/developer/monitor");
-                                    else if (select == "guard")
+                                    else if (role == "guard")
                                       router.push("/guard/monitor");
                                   }}
                                   className="flex p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
@@ -289,6 +290,10 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                     </Menu.Item>
                     <Menu.Item>
                       <button
+                        onClick={() => {
+                          localStorage.removeItem("user");
+                          router.push("/");
+                        }}
                         className={`group flex rounded-md items-center w-full px-2 py-2 text-sm hover:bg-gray-100`}
                       >
                         <FiLogOut className="h-5 w-5 mr-3" /> ออกจากระบบ
@@ -315,7 +320,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                   step="0.1"
                   value={volume}
                   onChange={(e) => {
-                    setCookie("volume", e.target.value);
+                    localStorage.setItem("volume", e.target.value);
                     setVolume(e.target.value);
                     play();
                   }}

@@ -7,7 +7,6 @@ import NProgress from "nprogress"; //*nprogress module
 import "nprogress/nprogress.css"; //*styles of nprogress
 import { ToastProvider } from "react-toast-notifications";
 import { SWRConfig } from "swr";
-import { CookiesProvider } from "react-cookie";
 
 //Binding events.
 Router.events.on("routeChangeStart", () => NProgress.start());
@@ -18,9 +17,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ToastProvider>
       <SWRConfig>
-        <CookiesProvider>
-          <Component {...pageProps} />
-        </CookiesProvider>
+        <Component {...pageProps} />
       </SWRConfig>
     </ToastProvider>
   );

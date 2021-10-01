@@ -44,9 +44,12 @@ const columns = [
 ];
 
 const Resident = ({ project, importReside, setImportReside }) => {
-  // console.log({ importReside });
   const router = useRouter();
   const { addToast } = useToasts(); //* toast
+  const [ID, setID] = useState("");
+  const [Name, setName] = useState("");
+  const [Phone, setPhone] = useState("");
+  const [Line, setLine] = useState("");
 
   useEffect(() => {
     //? check click project
@@ -103,6 +106,7 @@ const Resident = ({ project, importReside, setImportReside }) => {
   } catch (err) {
     console.log(err);
   }
+  console.log(data)
 
   //? Modal Import
   let [importModal, setImportModal] = useState(false);
@@ -184,7 +188,7 @@ const Resident = ({ project, importReside, setImportReside }) => {
                   <Import />
                   {validate.length > 0 && (
                     <div className="mt-5 ">
-                      <p>ข้อมูลบ้านที่มีผู้อยู่อาศัยแล้ว</p>
+                      <p>ข้อมูลบ้านที่มีผู้อยู่อาศัยหรือไม่มีบ้านเลขที่นี้</p>
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50 text-center">
                           <tr className="text-sm">
@@ -318,7 +322,15 @@ const Resident = ({ project, importReside, setImportReside }) => {
                                 </td>
                                 <td className="px-3 py-3 text-center items-center justify-center">
                                   {row.customer ? (
-                                    <a onClick={() => setQrcode(true)}>
+                                    <a
+                                      onClick={() => {
+                                        setID(project._id);
+                                        setName(row.customer.name)
+                                        setPhone(row.customer.phone)
+                                        setLine(row.customer.lineid)
+                                        setQrcode(true);
+                                      }}
+                                    >
                                       <Tooltip title="Qr code สำหรับเพิ่มผู้อยู่อาศัยบ้านหลังนี้">
                                         <IconButton>
                                           <CgTikcode className="w-5 h-5 hover:text-yellow-500" />
@@ -337,12 +349,13 @@ const Resident = ({ project, importReside, setImportReside }) => {
                                   >
                                     <div className="grid grid-cols-2 items-center">
                                       <QRCode
-                                        value="http://facebook.github.io/react/"
+                                        value={`${process.env.FRONT_END_URL}/form/residented/${project._id}/${ID}?name=${Name}&&phone=${Phone}&&line=${Line}`}
                                         style={{ height: 250, width: 250 }}
                                       />
                                       <div className="text-center">
-                                        <div>บ้าน/ห้องเลขที่ {row.title}</div>
-                                        <div>{row.title}</div>
+                                        <p>บ้าน/ห้องเลขที่ </p>
+                                        <p>ผู้อยู่อาศัย {Name}</p>
+                                        <p>เบอร์ติดต่อ {Phone}</p>
                                       </div>
                                     </div>
                                   </Modal>

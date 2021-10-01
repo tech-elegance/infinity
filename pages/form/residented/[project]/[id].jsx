@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import Link from "next/link";
-import useSWR from "swr";
-import { GoChevronLeft } from "react-icons/go";
 import { useForm, Controller } from "react-hook-form";
-import { connect } from "react-redux";
 import UseAnimations from "react-useanimations";
 import LoadingIcon from "react-useanimations/lib/loading";
-import { useToasts } from "react-toast-notifications";
 import axios from "axios";
-import Motion from "../../../../../../../components/motion/resident/edit";
-import Header from "../../../../../../../components/header";
-import Navbar from "../../../../../../../components/navbar";
-import fetcher from "../../../../../../../libs/fetcher/swr";
+import { useToasts } from "react-toast-notifications";
 
-const Residented = ({ form_address_map, project }) => {
-  const { addToast } = useToasts(); //* toast
+const Residented = () => {
   const router = useRouter();
-  const [token, setToken] = useState("");
+  const { addToast } = useToasts(); //* toast
+  const { id, project } = router.query;
+  const [Name, setName] = useState(router.query.name);
+  const [Phone, setPhone] = useState(router.query.phone);
+  const [Line, setLine] = useState();
 
-  useEffect(() => {
-    //? check click project
-    if (!project) router.push("/admin/company/type/project");
-  }, []);
+  // useEffect(() => {
+  //   setName(name);
+  //   setPhone(phone);
+  // }, []);
 
   //? from submit
   const [loading, setLoading] = useState(false);
@@ -37,20 +32,20 @@ const Residented = ({ form_address_map, project }) => {
   const onSubmit = (data) => {
     const { title, line, phone } = data;
     var obj = { name: title, phone, lineid: line };
-    console.log(obj);
+    // console.log(obj);
     setLoading(true); //* set loading effect on
     // //? send data
     axios
       .put(
-        `${process.env.BACK_END_URL}/organization/${project._id}/residence/${router.query.id}`,
+        `${process.env.BACK_END_URL}/organization/${project}/residence/${id}`,
         obj
       )
       .then((response) => {
-        console.log(response);
-        router.push("/admin/company/type/project/resident?alert=UPDATE");
+        // console.log(response);
+        router.push("/form/residented/alert");
       })
       .catch((err) => {
-        addToast(`การอัพเดทข้อมูลมีปัญหา`, {
+        addToast(`การอัพเดทข้อมูลมีปัญหา ${err}`, {
           appearance: "error",
           autoDismiss: true,
         });
@@ -58,39 +53,21 @@ const Residented = ({ form_address_map, project }) => {
       });
   };
 
-  try {
-    var { data, error } = useSWR(
-      `${process.env.BACK_END_URL}/organization/${project._id}/residence/${router.query.id}`,
-      fetcher
-    );
-     console.log(data);
-  } catch (err) {
-    console.log(err);
-  }
-
   return (
     <div>
       <Head>
-        <title>แก้ไขผู้อยู่อาศัย - Admin</title>
+        <title>เพิ่มผู้อยู่อาศัย</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="bg-gray-100 h-full dark:bg-gray-800  overflow-hidden relative">
-        <Header />
+      <main className="bg-gray-100 h-screen dark:bg-gray-800  overflow-hidden relative">
         <div className="flex items-start justify-between">
-          <Navbar />
-          <div className="w-full lg:mb-8 mt-4 lg:mx-4 pb-4 bg-white lg:rounded-2xl">
+          <div className="w-full lg:mb-8 lg:mx-4 pb-4 rounded-md bg-white lg:rounded-2xl">
             <div className="p-8">
               <h1 className="py-4 flex">
-                <Link href="/admin/company/type/project/resident">
-                  <a
-                    href="#"
-                    className="rounded-full h-8 w-8 flex items-center justify-center bg-yellow-500 hover:bg-yellow-400"
-                  >
-                    <GoChevronLeft className="h-5 w-5 text-white" />
-                  </a>
-                </Link>
-                <span className="ml-2">แก้ไขผู้อยู่อาศัย</span>
+                <span className="ml-2">เพิ่มผู้อยู่อาศัย</span>
               </h1>
+              <p>id:{id}</p>
+              <p>project:{project}</p>
               <hr className="bg-yellow-500 h-0.5" />
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mt-12 grid lg:grid-cols-3 gap-4">
@@ -100,6 +77,8 @@ const Residented = ({ form_address_map, project }) => {
                     </p>
                     <input
                       {...register("title", { required: true })}
+                      onChange={(e) => setName(e.target.value)}
+                      value={Name}
                       className={`w-full py-2 px-4 outline-none bg-blue-50 focus:bg-white focus:ring-indigo-500 focus:border-indigo-500  border-2 border-gray-500 rounded-md flex items-center mt-1 ${
                         errors.title && "border-red-500"
                       }`}
@@ -114,6 +93,8 @@ const Residented = ({ form_address_map, project }) => {
                     </p>
                     <input
                       {...register("phone", { required: true })}
+                      onChange={(e) => setPhone(e.target.value)}
+                      value={Phone}
                       className={`w-full py-2 px-4 outline-none bg-blue-50 focus:bg-white focus:ring-indigo-500 focus:border-indigo-500  border-2 border-gray-500 rounded-md flex items-center mt-1 ${
                         errors.phone && "border-red-500"
                       }`}
@@ -126,6 +107,8 @@ const Residented = ({ form_address_map, project }) => {
                     <p className={`text-md`}>Line ID</p>
                     <input
                       {...register("line", { required: false })}
+                      onChange={(e) => setLine(e.target.value)}
+                      value={Line}
                       className={`w-full py-2 px-4 outline-none bg-blue-50 focus:bg-white focus:ring-indigo-500 focus:border-indigo-500  border-2 border-gray-500 rounded-md flex items-center mt-1 ${
                         errors.line && "border-red-500"
                       }`}
@@ -133,39 +116,6 @@ const Residented = ({ form_address_map, project }) => {
                     {errors.line && (
                       <div className="text-red-500">กรุณากรอก ID line</div>
                     )}
-                  </div>
-                </div>
-                <div className="mt-5 flex items-center">
-                  {/* <div className="w-1/3">
-                    <p className={`text-md`}>
-                      User token(Life smart)
-                      <span className="text-red-500">*</span>
-                    </p>
-                    <input
-                      {...register("usertoken", { required: true })}
-                      className={`w-full py-2 px-4 outline-none bg-blue-50 focus:bg-white focus:ring-indigo-500 focus:border-indigo-500  border-2 border-gray-500 rounded-md flex items-center mt-1 ${
-                        errors.usertoken && "border-red-500"
-                      }`}
-                    />
-                    {errors.usertoken && (
-                      <div className="text-red-500">กรุณากรอก User Token</div>
-                    )}
-                  </div> */}
-                  <a
-                    type="button"
-                    target="_blank"
-                    // onClick={() => token !== "" && onToken(token)}
-                    href={`http://13.213.85.55:3030/residence/${router.query.id}/usertoken`}
-                    className="lg:mt-5 flex px-5 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-lg lg:float-right"
-                  >
-                    เชื่อมต่อ Token
-                  </a>
-                </div>
-
-                <div className="mt-12">
-                  <p className={`text-md`}>เลือกตำแหน่งเซ็นเซอร์</p>
-                  <div className="mt-3">
-                    <Motion />
                   </div>
                 </div>
 
@@ -195,9 +145,4 @@ const Residented = ({ form_address_map, project }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  form_address_map: state.form_address_map,
-  project: state.project,
-});
-
-export default connect(mapStateToProps)(Residented);
+export default Residented;

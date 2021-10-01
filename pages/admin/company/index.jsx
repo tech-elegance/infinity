@@ -21,7 +21,6 @@ import Navbar from "../../../components/navbar";
 import { useToasts } from "react-toast-notifications";
 import UseAnimations from "react-useanimations";
 import LoadingIcon from "react-useanimations/lib/loading";
-import { HiRefresh } from "react-icons/hi";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setCompany, setType, setProject } from "../../../libs/redux/action";
@@ -32,7 +31,6 @@ const Company = ({ setCompany, setType, setProject }) => {
 
   useEffect(() => {
     //? check click project
-
     switch (router.query.alert) {
       case "ADD":
         {

@@ -21,12 +21,20 @@ export default function List() {
     axios
       .post(`${process.env.BACK_END_URL}/login`, data)
       .then((res) => {
-        // console.log(response);
-        // router.push("/admin/company/type/project/plan?alert=ADD");
-        alert(res);
+        // alert(JSON.stringify(res));
+        // console.log(res.data);
+        if (res.status == 200) {
+          localStorage.setItem("user", JSON.stringify(res.data));
+          switch (res.data.data.role) {
+            case "admin":
+              router.push("/admin/company");
+              break;
+          }
+        }
+        setLoading(false); //* set loading effect off
       })
       .catch((err) => {
-        addToast(`การส่งข้อมูลมีปัญหา`, {
+        addToast(`การส่งข้อมูลมีปัญหา ${err}`, {
           appearance: "error",
           autoDismiss: true,
         });
