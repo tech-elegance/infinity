@@ -23,7 +23,7 @@ import { HiRefresh } from "react-icons/hi";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setType, setProject } from "../../../../libs/redux/action";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../libs/fetcher/swr";
 
 const Type = ({ company, setType, setProject }) => {
   const router = useRouter();

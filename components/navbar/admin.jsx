@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 const Admin = ({ company, types, project }) => {
   const router = useRouter();
   const path = router.asPath;
-  console.log({ company, types, project });
+
   //? actice effect class css
   const active =
     "dark:from-gray-700 dark:to-gray-800 text-white bg-gradient-to-r from-yellow-500 to-yellow-300 border-r-4 border-yellow-400";
@@ -247,20 +247,22 @@ const Admin = ({ company, types, project }) => {
           <span className="ml-2 text-sm font-medium">จัดการ Sensor IOT</span>
         </a>
       </Link>
-      <Link href="/logout">
-        <a
-          className={
-            "  uppercase  dark:text-gray-200 flex items-center p-5  transition-colors duration-200 justify-start hover:bg-gray-100 " +
-            (path === "/logout" ? active : "text-gray-600")
-          }
-          href="#"
-        >
-          <span className="text-left">
-            <FiLogOut className="h-5 w-5" />
-          </span>
-          <span className="ml-2 text-sm font-medium">ออกจากระบบ</span>
-        </a>
-      </Link>
+      <a
+        onClick={() => {
+          localStorage.removeItem("user");
+          router.push("/");
+        }}
+        className={
+          "  uppercase  dark:text-gray-200 flex items-center p-5  transition-colors duration-200 justify-start hover:bg-gray-100 " +
+          (path === "/logout" ? active : "text-gray-600")
+        }
+        href="#"
+      >
+        <span className="text-left">
+          <FiLogOut className="h-5 w-5" />
+        </span>
+        <span className="ml-2 text-sm font-medium">ออกจากระบบ</span>
+      </a>
     </nav>
   );
 };

@@ -14,8 +14,7 @@ import {
   transform,
 } from "framer-motion";
 import { setFormAddress_Map } from "../../../libs/redux/action";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../libs/fetcher/swr";
 
 const App = ({ setFormAddress_Map, form_address_map, project }) => {
   const router = useRouter();

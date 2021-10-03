@@ -28,7 +28,7 @@ import {
 import Header from "../../../../../../components/header";
 import Navbar from "../../../../../../components/navbar";
 import Import from "../../../../../../components/excel/import";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../libs/fetcher/swr";
 
 const columns = [
   { id: "status", label: "สถานะ" },

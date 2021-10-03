@@ -13,8 +13,7 @@ import {
   useDragControls,
   transform,
 } from "framer-motion";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../libs/fetcher/swr";
 
 const App = ({ project }) => {
   const router = useRouter();

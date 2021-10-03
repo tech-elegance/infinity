@@ -9,7 +9,7 @@ import moment from "moment";
 import router from "next/router";
 import Header from "../../../../../../components/header";
 import Navbar from "../../../../../../components/navbar";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../libs/fetcher/swr";
 
 const columns = [
   { id: "no", label: "ลำดับ" },

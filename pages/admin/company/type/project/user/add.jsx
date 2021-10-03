@@ -14,7 +14,7 @@ import MultiSelect from "react-multi-select-component";
 import { connect } from "react-redux";
 import Header from "../../../../../../components/header";
 import Navbar from "../../../../../../components/navbar";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../libs/fetcher/swr";
 
 const AddUser = ({ project }) => {
   const router = useRouter();

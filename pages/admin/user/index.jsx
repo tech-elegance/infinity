@@ -14,7 +14,7 @@ import Header from "../../../components/header";
 import Navbar from "../../../components/navbar";
 import { Menu, MenuItem, MenuButton, SubMenu } from "@szhsin/react-menu";
 import "@szhsin/react-menu/dist/index.css";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../libs/fetcher/swr";
 
 const columns = [
   { id: "no", label: "ลำดับ" },

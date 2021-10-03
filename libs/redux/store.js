@@ -9,4 +9,5 @@ export const initStore = (initialState = initial) =>
     reducer,
     initialState,
     composeWithDevTools(applyMiddleware(thunkMiddleware, logger))
+    //composeWithDevTools(applyMiddleware(thunkMiddleware))
   );

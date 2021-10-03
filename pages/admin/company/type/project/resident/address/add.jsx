@@ -15,7 +15,7 @@ import { connect } from "react-redux";
 import Header from "../../../../../../../components/header";
 import Navbar from "../../../../../../../components/navbar";
 import Motion from "../../../../../../../components/motion/address/add";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../../libs/fetcher/swr";
 
 const PlanAdd = ({ form_address_map, project }) => {
   const router = useRouter();

@@ -11,7 +11,7 @@ import useSWR from "swr";
 import Header from "../../../../../../components/header";
 import Navbar from "../../../../../../components/navbar";
 import Motion from "../../../../../../components/motion/resident/index";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../libs/fetcher/swr";
 
 const PlanHome = ({ project }) => {
   const router = useRouter();

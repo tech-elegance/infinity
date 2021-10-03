@@ -8,8 +8,7 @@ import useSWR from "swr";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { setMapPosition } from "../../libs/redux/action";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../libs/fetcher/swr";
 
 const App = ({ project, position, alert, setMapPosition }) => {
   const [activePage, setActivePage] = useState(1);
@@ -120,74 +119,72 @@ const App = ({ project, position, alert, setMapPosition }) => {
           .map((value) => {
             return (
               <>
-                <div className="h-screen">
-                  <MapInteractionCSS
-                    key={value.title}
-                    value={position ? position : scale}
-                    onChange={(value) => {
-                      setMapPosition(null);
-                      setScale(value);
-                    }}
-                  >
-                    <div className="relative">
-                      {data
-                        ? data.data
-                            .filter((filt) =>
-                              filt.position.plan_floor
-                                .toLowerCase()
-                                .includes(
-                                  data.organizationPlans[activePage - 1]._id
-                                )
-                            )
-                            .map((row) => (
-                              <Link
-                                href={`/admin/company/type/project/monitor/${row.residence}`}
+                <MapInteractionCSS
+                  key={value.title}
+                  value={position ? position : scale}
+                  onChange={(value) => {
+                    setMapPosition(null);
+                    setScale(value);
+                  }}
+                >
+                  <div className="relative">
+                    {data
+                      ? data.data
+                          .filter((filt) =>
+                            filt.position.plan_floor
+                              .toLowerCase()
+                              .includes(
+                                data.organizationPlans[activePage - 1]._id
+                              )
+                          )
+                          .map((row) => (
+                            <Link
+                              href={`/admin/company/type/project/monitor/${row.residence}`}
+                            >
+                              <motion.div
+                                initial={false}
+                                whileHover={{ scale: 1.2 }}
+                                whileTap={{ scale: 0.9 }}
+                                animate={row.position.position}
+                                style={{
+                                  height: row.position.height,
+                                  width: row.position.width,
+                                }}
+                                className={` absolute text-center ${
+                                  handleAlert(row)
+                                  // console.log(row)
+                                  // (row.status === "online" && "bg-green-500") ||
+                                  // (row.status === "offline" && "bg-gray-500") ||
+                                  // (row.status === "security" && "bg-blue-500")
+                                }`}
                               >
-                                <motion.div
-                                  initial={false}
-                                  whileHover={{ scale: 1.2 }}
-                                  whileTap={{ scale: 0.9 }}
-                                  animate={row.position.position}
-                                  style={{
-                                    height: row.position.height,
-                                    width: row.position.width,
-                                  }}
-                                  className={` absolute text-center ${
-                                    handleAlert(row)
-                                    // console.log(row)
-                                    // (row.status === "online" && "bg-green-500") ||
-                                    // (row.status === "offline" && "bg-gray-500") ||
-                                    // (row.status === "security" && "bg-blue-500")
-                                  }`}
+                                <small
+                                  className="text-white"
+                                  style={{ fontSize: 8 }}
                                 >
-                                  <small
-                                    className="text-white"
-                                    style={{ fontSize: 8 }}
-                                  >
-                                    {row.title}
-                                  </small>
-                                </motion.div>
-                              </Link>
-                            ))
-                        : null}
-                    </div>
-                    {/* <img
+                                  {row.title}
+                                </small>
+                              </motion.div>
+                            </Link>
+                          ))
+                      : null}
+                  </div>
+                  {/* <img
                     src={`${process.env.BACK_END_URL}/${value.image}`}
                     style={{ height: 800, width: 1280 }}
                   /> */}
-                    <div
-                      style={{
-                        backgroundImage: `url(${process.env.BACK_END_URL}/${value.image})`,
-                        backgroundPosition: "center",
-                        backgroundSize: "cover",
-                        backgroundRepeat: "no-repeat",
-                        height: 768,
-                        width: 1024,
-                        display: "flex",
-                      }}
-                    />
-                  </MapInteractionCSS>
-                </div>
+                  <div
+                    style={{
+                      backgroundImage: `url(${process.env.BACK_END_URL}/${value.image})`,
+                      backgroundPosition: "center",
+                      backgroundSize: "cover",
+                      backgroundRepeat: "no-repeat",
+                      height: 768,
+                      width: 1024,
+                      display: "flex",
+                    }}
+                  />
+                </MapInteractionCSS>
               </>
             );
           })}

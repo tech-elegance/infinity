@@ -18,7 +18,6 @@ import io from "socket.io-client";
 import { Modal, Button, Slider } from "react-rainbow-components";
 import useSound from "use-sound";
 import moment from "moment";
-import axios from "axios";
 
 const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
   //? check role for position
@@ -58,7 +57,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
       });
     }
   }, []);
-  // console.log(alert);
+  //  console.log(alert);
 
   return (
     <header className="shadow-lg bg-white dark:bg-gray-700 items-center h-16 z-40 lg:rounded-2xl lg:m-4">
@@ -152,6 +151,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                                   href="#"
                                   key={item.data._id}
                                   onClick={() => {
+                                    console.log(item.data);
                                     close();
                                     setMapPosition({
                                       scale: 3,
@@ -270,7 +270,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
               >
                 <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <div className="px-1 py-1 ">
-                    <Menu.Item>
+                    {/* <Menu.Item>
                       <button
                         onClick={() => play()}
                         className={`group flex rounded-md items-center w-full px-2 py-2 text-sm hover:bg-gray-100`}
@@ -278,7 +278,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                         <AiOutlineProfile className="h-5 w-5 mr-3" />
                         โปรไฟล์
                       </button>
-                    </Menu.Item>
+                    </Menu.Item> */}
                     <Menu.Item>
                       <button
                         onClick={() => setOption(true)}

@@ -10,16 +10,25 @@ import Header from "../../../../../../components/header";
 import Navbar from "../../../../../../components/navbar";
 import Motion from "../../../../../../components/motion/index";
 import { setMapPosition } from "../../../../../../libs/redux/action";
-// import useSocket from "../../../../../../libs/socket";
 import useSWR from "swr";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../../libs/fetcher/swr";
 
 const Home = ({ position, project, setMapPosition }) => {
   useEffect(() => {
     //? check click company
     if (!project) router.push("/admin/company/type/project");
   }, []);
+
+  //? find data
+  try {
+    var { data, error } = useSWR(
+      `${process.env.BACK_END_URL}/organization/${project._id}/monitoring`,
+      fetcher,
+      { refreshInterval: 3000 }
+    );
+  } catch (err) {
+    console.log(err);
+  }
 
   return (
     <div>
@@ -50,12 +59,36 @@ const Home = ({ position, project, setMapPosition }) => {
               <hr className="bg-yellow-500 h-0.5" />
               <div className=" grid grid-cols-2 items-center mt-3">
                 <p className=" text-gray-600 font-medium">
-                  จำนวนทั้งหมด: 10 หลัง
+                  จำนวนทั้งหมด: {data && data.data.length} หลัง
                 </p>
               </div>
-            </div>
 
-            <Motion />
+              <div className="grid lg:grid-cols-5 mt-3">
+                <div className="flex">
+                  <div className="h-5 w-5 bg-green-500" />
+                  <span className="ml-3">Online</span>
+                </div>
+                <div className="flex">
+                  <div className="h-5 w-5 bg-gray-500" />
+                  <span className="ml-3">Offline</span>
+                </div>
+                <div className="flex">
+                  <div className="h-5 w-5 bg-blue-500" />
+                  <span className="ml-3">ฝากบ้าน</span>
+                </div>
+                <div className="flex">
+                  <div className="h-5 w-5 bg-red-500" />
+                  <span className="ml-3">แจ้งเตือน</span>
+                </div>
+                <div className="flex">
+                  <div className="h-5 w-5 bg-yellow-500" />
+                  <span className="ml-3">รับการแจ้งเตือนจากรปภ.</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <Motion />
+            </div>
           </div>
         </div>
       </main>

@@ -12,7 +12,8 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setProject } from "../../../../../libs/redux/action";
 import router from "next/router";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+import fetcher from "../../../../../libs/fetcher/swr";
+ 
 
 const Project = ({ company, types, setProject }) => {
 

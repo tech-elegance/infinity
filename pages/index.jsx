@@ -306,7 +306,7 @@ export default function List() {
                   <div className="w-full px-3 mb-5 ">
                     <button
                       type="submit"
-                      className=" w-full max-w-xs mx-auto bg-yellow-500 hover:bg-yellow-700 focus:bg-yellow-700 text-white rounded-lg px-3 py-3 font-medium flex"
+                      className=" w-full max-w-xs mx-auto bg-yellow-500 hover:bg-yellow-700 focus:bg-yellow-700 text-white rounded-lg px-3 py-3 font-medium flex items-center justify-center"
                     >
                       {loading && (
                         <UseAnimations
