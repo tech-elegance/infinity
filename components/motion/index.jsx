@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { MapInteractionCSS } from "react-map-interaction";
 import { Card, Pagination } from "react-rainbow-components";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
@@ -7,14 +7,20 @@ import { connect } from "react-redux";
 import useSWR from "swr";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { setMapPosition } from "../../libs/redux/action";
+import { setMapPosition, setActivePage } from "../../libs/redux/action";
 import fetcher from "../../libs/fetcher/swr";
 
-const App = ({ project, position, alert, setMapPosition }) => {
-  const [activePage, setActivePage] = useState(1);
+const App = ({
+  project,
+  position,
+  alert,
+  setMapPosition,
+  activePage,
+  setActivePage,
+}) => {
   const [scale, setScale] = useState({
-    scale: 0.5,
-    translation: { x: 0, y: 0 },
+    scale: 0.9,
+    translation: { x: 300, y: 0 },
   });
 
   //? find data
@@ -27,12 +33,6 @@ const App = ({ project, position, alert, setMapPosition }) => {
   } catch (err) {
     console.log(err);
   }
-  // console.log(data);
-  //console.log("alert:", alert);
-
-  const handleActivePage = (value) => {
-    setActivePage(value);
-  };
 
   //? เช็คสถานะบ้าน
   const handleAlert = (row) => {
@@ -71,6 +71,14 @@ const App = ({ project, position, alert, setMapPosition }) => {
     }
   };
 
+  //? checck activePage undefined from redux
+  const onPage = () => {
+    if (typeof activePage === "undefined") return 1;
+    else return activePage;
+  };
+
+ 
+
   return (
     <>
       {data && (
@@ -78,7 +86,7 @@ const App = ({ project, position, alert, setMapPosition }) => {
           <div className="flex items-center">
             <a
               href="#"
-              onClick={() => activePage > 1 && setActivePage(activePage - 1)}
+              onClick={() => onPage() > 1 && setActivePage(onPage() - 1)}
             >
               <BsChevronLeft className="h-5 w-5 text-gray-500" />
             </a>
@@ -91,7 +99,7 @@ const App = ({ project, position, alert, setMapPosition }) => {
                 >
                   <div
                     className={`h-6 w-6 flex items-center justify-center rounded-full ${
-                      activePage === i + 1 && "bg-yellow-400 text-white"
+                      onPage() === i + 1 && "bg-yellow-400 text-white"
                     } `}
                   >
                     {i + 1}
@@ -103,8 +111,8 @@ const App = ({ project, position, alert, setMapPosition }) => {
               href="#"
               onClick={() => {
                 data &&
-                  activePage < data.organizationPlans.length &&
-                  setActivePage(activePage + 1);
+                  onPage() < data.organizationPlans.length &&
+                  setActivePage(onPage() + 1);
               }}
             >
               <BsChevronRight className="h-5 w-5 text-gray-500" />
@@ -114,80 +122,72 @@ const App = ({ project, position, alert, setMapPosition }) => {
       )}
 
       {data &&
-        data.organizationPlans
-          .slice(activePage - 1, activePage)
-          .map((value) => {
-            return (
-              <>
-                <MapInteractionCSS
-                  key={value.title}
-                  value={position ? position : scale}
-                  onChange={(value) => {
-                    setMapPosition(null);
-                    setScale(value);
-                  }}
-                >
-                  <div className="relative">
-                    {data
-                      ? data.data
-                          .filter((filt) =>
-                            filt.position.plan_floor
-                              .toLowerCase()
-                              .includes(
-                                data.organizationPlans[activePage - 1]._id
-                              )
-                          )
-                          .map((row) => (
-                            <Link
-                              href={`/admin/company/type/project/monitor/${row.residence}`}
+        data.organizationPlans.slice(onPage() - 1, onPage()).map((value) => {
+          return (
+            <>
+              <MapInteractionCSS
+                key={value.title}
+                value={position ? position : scale}
+                onChange={(value) => {
+                  setMapPosition(null);
+                  setScale(value);
+                }}
+              >
+                <div className="relative">
+                  {data
+                    ? data.data
+                        .filter((filt) =>
+                          filt.position.plan_floor
+                            .toLowerCase()
+                            .includes(data.organizationPlans[onPage() - 1]._id)
+                        )
+                        .map((row) => (
+                          <Link
+                            href={`/admin/company/type/project/monitor/${row.residence}`}
+                          >
+                            <motion.div
+                              initial={false}
+                              whileHover={{ scale: 1.2 }}
+                              whileTap={{ scale: 0.9 }}
+                              animate={row.position.position}
+                              style={{
+                                height: row.position.height,
+                                width: row.position.width,
+                              }}
+                              className={` absolute text-center ${handleAlert(
+                                row
+                              )}`}
                             >
-                              <motion.div
-                                initial={false}
-                                whileHover={{ scale: 1.2 }}
-                                whileTap={{ scale: 0.9 }}
-                                animate={row.position.position}
-                                style={{
-                                  height: row.position.height,
-                                  width: row.position.width,
-                                }}
-                                className={` absolute text-center ${
-                                  handleAlert(row)
-                                  // console.log(row)
-                                  // (row.status === "online" && "bg-green-500") ||
-                                  // (row.status === "offline" && "bg-gray-500") ||
-                                  // (row.status === "security" && "bg-blue-500")
-                                }`}
+                              <small
+                                className="text-white"
+                                style={{ fontSize: 8 }}
                               >
-                                <small
-                                  className="text-white"
-                                  style={{ fontSize: 8 }}
-                                >
-                                  {row.title}
-                                </small>
-                              </motion.div>
-                            </Link>
-                          ))
-                      : null}
-                  </div>
-                  {/* <img
+                                {row.title}
+                              </small>
+                            </motion.div>
+                          </Link>
+                        ))
+                    : null}
+                </div>
+                {/* <img
                     src={`${process.env.BACK_END_URL}/${value.image}`}
                     style={{ height: 800, width: 1280 }}
                   /> */}
-                  <div
-                    style={{
-                      backgroundImage: `url(${process.env.BACK_END_URL}/${value.image})`,
-                      backgroundPosition: "center",
-                      backgroundSize: "cover",
-                      backgroundRepeat: "no-repeat",
-                      height: 768,
-                      width: 1024,
-                      display: "flex",
-                    }}
-                  />
-                </MapInteractionCSS>
-              </>
-            );
-          })}
+                <div
+                  style={{
+                    backgroundImage: `url(${process.env.BACK_END_URL}/${value.image})`,
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    height: 768,
+                    width: 1024,
+                    display: "flex",
+                  }}
+                />
+              </MapInteractionCSS>
+            </>
+          );
+        })}
     </>
   );
 };
@@ -196,10 +196,12 @@ const mapStateToProps = (state) => ({
   project: state.project,
   position: state.position,
   alert: state.alert,
+  activePage: state.activePage,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   setMapPosition: bindActionCreators(setMapPosition, dispatch),
+  setActivePage: bindActionCreators(setActivePage, dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

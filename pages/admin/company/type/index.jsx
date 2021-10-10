@@ -352,7 +352,7 @@ const Type = ({ company, setType, setProject }) => {
               </div>
               <div className="mt-7">
                 {data ? (
-                  <div className="grid md:grid-cols-4 gap-4 items-center mt-7">
+                  <div className="grid xl:grid-cols-7 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 items-center mt-7">
                     {data.data
                       .filter((filt) =>
                         filt.title
@@ -367,7 +367,7 @@ const Type = ({ company, setType, setProject }) => {
                               className="invisible"
                             >
                               <span className="absolute top-2 right-2 group-hover:visible ">
-                                <RiEdit2Fill className="h-8 w-8 text-white rounded-full p-1 hover:bg-yellow-500" />
+                                <RiEdit2Fill className="h-8 w-8  rounded-full p-1 text-gray-300 hover:bg-yellow-500 hover:text-white" />
                               </span>
                             </Link>
                             <a
@@ -379,12 +379,12 @@ const Type = ({ company, setType, setProject }) => {
                                 router.push("/admin/company/type/project");
                               }}
                             >
-                              <div className="flex items-center">
+                              <div className="flex items-center justify-center">
                                 <img
                                   src={`${process.env.BACK_END_URL}${row.image}`}
                                   alt={`${process.env.BACK_END_URL}${row.image}`}
                                   className="rounded-md"
-                                  style={{ height: "300px", width: "500px" }}
+                                  style={{ height: 144 }}
                                 />
                               </div>
 

@@ -22,7 +22,7 @@ export default function List() {
       .post(`${process.env.BACK_END_URL}/login`, data)
       .then((res) => {
         // alert(JSON.stringify(res));
-        // console.log(res.data);
+        //  console.log(res.data);
         if (res.status == 200) {
           localStorage.setItem("user", JSON.stringify(res.data));
           switch (res.data.data.role) {

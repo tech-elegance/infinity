@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import ResizableRect from "react-resizable-rotatable-draggable";
 import { MapInteractionCSS } from "react-map-interaction";
@@ -14,10 +14,13 @@ import {
   transform,
 } from "framer-motion";
 import fetcher from "../../../libs/fetcher/swr";
+import { setSensorResident } from "../../../libs/redux/action";
 
-const App = ({ project }) => {
+const App = ({ project, sensorResident ,setSensorResident}) => {
   const router = useRouter();
-  var position;
+  const constraintsRef = useRef(null);
+  const [activePage, setActivePage] = useState(1);
+  const [sensor, setSensor] = useState([]);
 
   //? find data
   try {
@@ -29,52 +32,71 @@ const App = ({ project }) => {
   } catch (err) {
     console.log(err);
   } finally {
-    console.log(data)
+    //console.log({ data });
   }
 
-  const [activePage, setActivePage] = useState(1);
+  const updateFieldChanged =
+    (index, data) =>
+    ({ x, y }) => {
+      var top = Math.round(y);
+      var left = Math.round(x);
+      // console.log("index: " + index);
+      // console.log({top,left});
+      let newArr = [...sensor]; // copying the old datas array
+      newArr[index] = {
+        top,
+        left,
+        data,
+      }; // replace e.target.value with whatever you want to change it to
+      setSensor(newArr);
+      setSensorResident(newArr);
+    };
 
-  const handleActivePage = (value) => {
-    setActivePage(value);
-  };
+  console.log({sensorResident});
 
   return (
     <>
       {data &&
         data.data.residenceplan.plan
-
           .slice(activePage - 1, activePage)
           .map((value) => {
             return (
               <>
-                <div className="shadow-lg ">
+                <motion.div ref={constraintsRef}>
                   <div className="relative">
                     {data
-                      ? data.sensorPosition.map((row) => (
-                          <motion.div
-                            drag
-                            dragMomentum={false}
-                            animate={row.position}
-                            style={{
-                              backgroundImage: `url(${process.env.BACK_END_URL}/${row.image})`,
-                              backgroundPosition: "center",
-                              backgroundSize: "contain",
-                              backgroundRepeat: "no-repeat",
-                              height: 50,
-                              width: 50,
-                            }}
-                            className="  absolute text-center"
-                          >
-                            <small
-                              className="text-white"
-                              style={{ fontSize: 8 }}
+                      ? data.sensorPosition
+                          .filter((filt) =>
+                            filt.floor.toLowerCase().includes("fl" + activePage)
+                          )
+                          .map((row, index) => (
+                            <motion.div
+                              drag
+                              dragConstraints={constraintsRef}
+                              dragMomentum={false}
+                              animate={row.position}
+                              onHoverEnd={updateFieldChanged(index, row)}
+                              style={{
+                                backgroundImage: `url(${process.env.BACK_END_URL}/${row.image})`,
+                                backgroundPosition: "center",
+                                backgroundSize: "contain",
+                                backgroundRepeat: "no-repeat",
+                                height: 75,
+                                width: 75,
+                              }}
+                              className="text-center"
                             >
-                              {row.title}
-                            </small>
-                          </motion.div>
-                        ))
+                              <small
+                                className="absolute left-0 text-red-500 font-bold"
+                                style={{ fontSize: 10, bottom: -1, width: 75 }}
+                              >
+                                {row.name}
+                              </small>
+                            </motion.div>
+                          ))
                       : null}
                   </div>
+
                   <div
                     style={{
                       backgroundImage: `url(${process.env.BACK_END_URL}/${value.plan})`,
@@ -86,7 +108,7 @@ const App = ({ project }) => {
                       display: "flex",
                     }}
                   />
-                </div>
+                </motion.div>
               </>
             );
           })}
@@ -122,22 +144,17 @@ const App = ({ project }) => {
           </div>
         </div>
       )}
-      {/* {data && (
-        <Pagination
-          type="button"
-          className="rainbow-m_auto"
-          pages={data.data.residenceplan.plan.length}
-          activePage={handleActivePage}
-          onChange={(event, page) => setActivePage(page)}
-          className="mt-5"
-        />
-      )} */}
     </>
   );
 };
 
 const mapStateToProps = (state) => ({
   project: state.project,
+  sensorResident: state.sensorResident,
 });
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = (dispatch) => ({
+  setSensorResident: bindActionCreators(setSensorResident, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

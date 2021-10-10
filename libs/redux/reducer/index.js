@@ -8,6 +8,8 @@ const initial = {
   alert: {}, //* เก็บค่า alert จากกระดิ่ง
   form_address_map: {}, //* เก็บค่าจาก motion ไป form หน้า Address
   importReside: [],
+  activePage: 1, //* เปลี่ยนหน้าหลังคลิก alert
+  sensorResident: [] //* เก็บตำแหน่ง Sensor
 };
 
 //? REDUCERS
@@ -29,6 +31,10 @@ export const reducer = (state = initial, action) => {
       });
     case actionTypes.SET_IMPORT_RESIDE:
       return Object.assign({}, state, { importReside: action.importReside });
+    case actionTypes.SET_ACTIVEPAGE:
+      return Object.assign({}, state, { activePage: action.activePage });
+    case actionTypes.SET_MAP_SENSOR:
+      return Object.assign({}, state, { sensorResident: action.sensorResident });
     default:
       return state;
   }

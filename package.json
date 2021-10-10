@@ -43,6 +43,7 @@
     "react-resizable-rotatable-draggable": "^0.2.0",
     "react-reveal": "^1.2.2",
     "react-select": "^4.3.1",
+    "react-to-print": "^2.13.0",
     "react-toast-notifications": "^2.5.1",
     "react-useanimations": "^2.0.6",
     "redux": "^4.1.1",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import useSWR from "swr";
 import TablePagination from "@material-ui/core/TablePagination";
 import IconButton from "@material-ui/core/IconButton";
 import { HiPlusSm } from "react-icons/hi";
+import { AiOutlinePrinter } from "react-icons/ai";
 import { RiImageEditFill } from "react-icons/ri";
 import { CgTikcode } from "react-icons/cg";
 import { SiMicrosoftexcel } from "react-icons/si";
@@ -21,6 +22,7 @@ import QRCode from "qrcode.react";
 import axios from "axios";
 import UseAnimations from "react-useanimations";
 import LoadingIcon from "react-useanimations/lib/loading";
+import ReactToPrint from "react-to-print";
 import {
   setProject,
   setImportReside,
@@ -36,6 +38,7 @@ const columns = [
   { id: "name", label: "ชื่อผู้อาศัย" },
   { id: "phone", label: "เบอร์ติดต่อ" },
   { id: "date", label: "วันเวลาออนไลน์ล่าสุด" },
+  { id: "lifesmart", label: "Lifesmart ID" },
   { id: "qrcode", label: "QR Form" },
   {
     id: "action",
@@ -43,13 +46,11 @@ const columns = [
   },
 ];
 
-const Resident = ({ project, importReside, setImportReside }) => {
+const Resident = ({ project, importReside, setImportReside, capture }) => {
   const router = useRouter();
   const { addToast } = useToasts(); //* toast
-  const [ID, setID] = useState("");
-  const [Name, setName] = useState("");
-  const [Phone, setPhone] = useState("");
-  const [Line, setLine] = useState("");
+  const [cardData, setCardData] = useState({});
+  const componentRef = useRef();
 
   useEffect(() => {
     //? check click project
@@ -106,9 +107,9 @@ const Resident = ({ project, importReside, setImportReside }) => {
   } catch (err) {
     console.log(err);
   }
-  console.log(data)
+  console.log(data);
 
-  //? Modal Import
+  //? Modal import excel
   let [importModal, setImportModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validate, setValidate] = useState([]);
@@ -120,10 +121,11 @@ const Resident = ({ project, importReside, setImportReside }) => {
           title: value[0],
           name: value[1],
           phone: value[2],
-          line: value[3],
+          plan: value[3],
         });
     });
     setLoading(true);
+    console.log({ obj });
     axios
       .post(
         `${process.env.BACK_END_URL}/organization/${project._id}/bulkResidence`,
@@ -320,14 +322,30 @@ const Resident = ({ project, importReside, setImportReside }) => {
                                     <span className="text-gray-400 ">-</span>
                                   )}
                                 </td>
+                                <td className="px-3 py-3 text-center">
+                                  {row.customer ? (
+                                    row.customer.userid === 0 ? (
+                                      <span className="text-gray-400 ">
+                                        ยังไม่ถูกเชื่อมต่อ
+                                      </span>
+                                    ) : (
+                                      row.customer.userid
+                                    )
+                                  ) : null}
+                                </td>
                                 <td className="px-3 py-3 text-center items-center justify-center">
                                   {row.customer ? (
                                     <a
                                       onClick={() => {
-                                        setID(project._id);
-                                        setName(row.customer.name)
-                                        setPhone(row.customer.phone)
-                                        setLine(row.customer.lineid)
+                                        console.log(row);
+                                        setCardData({
+                                          id: project._id,
+                                          title: row.title,
+                                          name: row.customer.name,
+                                          phone: row.customer.phone,
+                                          line: row.customer.lineid,
+                                        });
+
                                         setQrcode(true);
                                       }}
                                     >
@@ -346,16 +364,32 @@ const Resident = ({ project, importReside, setImportReside }) => {
                                     id="modal-1"
                                     isOpen={qrcode}
                                     onRequestClose={() => setQrcode(false)}
+                                    ref={componentRef}
                                   >
                                     <div className="grid grid-cols-2 items-center">
-                                      <QRCode
-                                        value={`${process.env.FRONT_END_URL}/form/residented/${project._id}/${ID}?name=${Name}&&phone=${Phone}&&line=${Line}`}
-                                        style={{ height: 250, width: 250 }}
-                                      />
+                                      <div>
+                                        <QRCode
+                                          value={`${process.env.FRONT_END_URL}/form/residented/${project._id}/${cardData.id}?name=${cardData.name}&&phone=${cardData.phone}&&line=${cardData.line}`}
+                                          style={{ height: 250, width: 250 }}
+                                        />
+                                      </div>
                                       <div className="text-center">
-                                        <p>บ้าน/ห้องเลขที่ </p>
-                                        <p>ผู้อยู่อาศัย {Name}</p>
-                                        <p>เบอร์ติดต่อ {Phone}</p>
+                                        <p>บ้าน/ห้องเลขที่ {cardData.title}</p>
+                                        <p>ผู้อยู่อาศัย {cardData.name}</p>
+                                        <p>เบอร์ติดต่อ {cardData.phone}</p>
+                                      </div>
+                                      <div className="mt-3">
+                                        <ReactToPrint
+                                          trigger={() => (
+                                            <button className="hover:text-yellow-500 flex">
+                                              <AiOutlinePrinter className="w-6 h-6" />
+                                              <span className="ml-1">
+                                                Print this out!
+                                              </span>
+                                            </button>
+                                          )}
+                                          content={() => componentRef.current}
+                                        />
                                       </div>
                                     </div>
                                   </Modal>

@@ -49,3 +49,20 @@ export const setImportReside = (importReside) => (dispatch) => {
     importReside,
   });
 };
+
+export const setActivePage = (activePage) => (dispatch) => {
+  return dispatch({
+    type: actionTypes.SET_ACTIVEPAGE,
+    activePage,
+  });
+};
+
+export const setSensorResident = (sensorResident) => (dispatch) => {
+  return dispatch({
+    type: actionTypes.SET_MAP_SENSOR,
+    sensorResident,
+  });
+};
+
+
+

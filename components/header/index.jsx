@@ -13,13 +13,26 @@ import { Popover, Transition, Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { setMapPosition, setAlert } from "../../libs/redux/action";
+import useSWR from "swr";
+import {
+  setMapPosition,
+  setAlert,
+  setActivePage,
+} from "../../libs/redux/action";
 import io from "socket.io-client";
 import { Modal, Button, Slider } from "react-rainbow-components";
 import useSound from "use-sound";
 import moment from "moment";
+import fetcher from "../../libs/fetcher/swr";
+import axios from "axios";
 
-const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
+const Header = ({
+  setMapPosition,
+  setAlertRedux,
+  project,
+  alertRedux,
+  setActivePage,
+}) => {
   //? check role for position
   const router = useRouter();
   const [role, setrole] = useState(); //* admin=ผู้ดูแลระบบ,developer=ผู้ดูแลโครงการ,guard=หน่วยรักษาความปลอดภัย
@@ -34,7 +47,6 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
 
   useEffect(() => {
     var user = JSON.parse(localStorage.getItem("user"));
-    // console.log(user.token)
     if (localStorage.getItem("volume"))
       setVolume(parseFloat(localStorage.getItem("volume")));
 
@@ -57,7 +69,59 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
       });
     }
   }, []);
-  //  console.log(alert);
+
+  // console.log(alert[0].data.residence[0].position.plan_floor);
+
+  const onAlert = async (item) => {
+    console.log(item.data);
+    close();
+    setMapPosition({
+      scale: 3,
+      translation: {
+        x: item.data.residence[0].position.position.x,
+        y: item.data.residence[0].position.position.y,
+      },
+    });
+
+    //! active change page
+    axios
+      .get(`${process.env.BACK_END_URL}/organization/${project._id}/monitoring`)
+      .then(function (response) {
+        response.data &&
+          response.data.organizationPlans.map((val, i) => {
+            if (val._id == item.data.residence[0].position.plan_floor) {
+              setActivePage(i + 1);
+              console.log(response.data);
+            }
+          });
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      });
+
+    //! check role for change path
+    if (role == "admin") router.push("/admin/company/type/project/monitor");
+    else if (role == "developer") router.push("/developer/monitor");
+    else if (role == "guard") router.push("/guard/monitor");
+  };
+
+  //? find data Header
+  var userlocal =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+  try {
+    var { data: user, error } = useSWR(
+      `${process.env.BACK_END_URL}/profile/${userlocal.data.id}`,
+      fetcher,
+      { refreshInterval: 3000 }
+    );
+  } catch (err) {
+    console.log(err);
+  } finally {
+    //console.log({ user });
+  }
 
   return (
     <header className="shadow-lg bg-white dark:bg-gray-700 items-center h-16 z-40 lg:rounded-2xl lg:m-4">
@@ -150,28 +214,7 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                                 <a
                                   href="#"
                                   key={item.data._id}
-                                  onClick={() => {
-                                    console.log(item.data);
-                                    close();
-                                    setMapPosition({
-                                      scale: 3,
-                                      translation: {
-                                        x: item.data.residence[0].position
-                                          .position.x,
-                                        y: item.data.residence[0].position
-                                          .position.y,
-                                      },
-                                    });
-                                    //! check role for change path
-                                    if (role == "admin")
-                                      router.push(
-                                        "/admin/company/type/project/monitor"
-                                      );
-                                    else if (role == "developer")
-                                      router.push("/developer/monitor");
-                                    else if (role == "guard")
-                                      router.push("/guard/monitor");
-                                  }}
+                                  onClick={() => onAlert(item)}
                                   className="flex p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                                 >
                                   <div className="flex items-center w-10 h-10  sm:h-12 sm:w-12">
@@ -246,10 +289,12 @@ const Header = ({ setMapPosition, setAlertRedux, project, alertRedux }) => {
                       />
                     </div>
                     <div className="ml-2">
-                      <span className="text-gray-500">admin@admin.com</span>
+                      <span className="text-gray-500">
+                        {user && user.data.name}
+                      </span>
                       <br />
                       <span className="text-gray-400 grid text-right">
-                        admin
+                        {user && user.data.role}
                       </span>
                     </div>
                   </button>
@@ -342,6 +387,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   setMapPosition: bindActionCreators(setMapPosition, dispatch),
   setAlertRedux: bindActionCreators(setAlert, dispatch),
+  setActivePage: bindActionCreators(setActivePage, dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

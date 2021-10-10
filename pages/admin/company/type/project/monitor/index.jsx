@@ -29,6 +29,7 @@ const Home = ({ position, project, setMapPosition }) => {
   } catch (err) {
     console.log(err);
   }
+   console.log({data}) //! ขาดชื่อโครงการ
 
   return (
     <div>
@@ -52,7 +53,7 @@ const Home = ({ position, project, setMapPosition }) => {
                   </a>
                 </Link>
                 <span className="ml-2">
-                  แบบผังโครงการ บ้านกาญจน์กนก 21
+                  แบบผังโครงการ {data && data.organizationTitle}
                   {/* {JSON.stringify(position)} */}
                 </span>
               </h1>

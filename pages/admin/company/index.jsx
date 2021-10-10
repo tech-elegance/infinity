@@ -432,7 +432,7 @@ const Company = ({ setCompany, setType, setProject }) => {
               </div>
               <div className="mt-7">
                 {data ? (
-                  <div className="grid md:grid-cols-4 gap-4 items-center mt-7">
+                  <div className="grid xl:grid-cols-7 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 items-center mt-7">
                     {data.data
                       .filter((filt) =>
                         filt.title
@@ -446,9 +446,12 @@ const Company = ({ setCompany, setType, setProject }) => {
                               href={`/admin/company/edit?id=${row._id}&title=${row.title}&logo=${row.logo}&banner=${row.banner}`}
                               className="invisible"
                             >
-                              <span className="absolute top-2 right-2 group-hover:visible ">
-                                <RiEdit2Fill className="h-8 w-8 text-white rounded-full p-1 hover:bg-yellow-500" />
-                              </span>
+                              <a
+                                href="#"
+                                className="absolute top-2 right-2 group-hover:visible "
+                              >
+                                <RiEdit2Fill className="h-8 w-8  rounded-full p-1 text-gray-300 hover:bg-yellow-500 hover:text-white" />
+                              </a>
                             </Link>
                             <a
                               href="#"
@@ -464,12 +467,12 @@ const Company = ({ setCompany, setType, setProject }) => {
                               }}
                               className="justify-center text-center hover:text-yellow-500 group"
                             >
-                              <div className="flex items-center">
+                              <div className="flex items-center" >
                                 <img
                                   src={`${process.env.BACK_END_URL}${row.banner}`}
                                   alt={`${process.env.BACK_END_URL}${row.banner}`}
                                   className="rounded-md"
-                                  style={{ height: "300px", width: "500px" }}
+                                   style={{ height: 144 }}
                                 />
                               </div>
                               <h3 className="font-medium text-center">
